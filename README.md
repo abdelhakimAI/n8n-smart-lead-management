@@ -41,7 +41,7 @@ Create a calendar Event
 ```
 
 ### Workflow Screenshot
-`![Workflow](./screenshots/workflow-overview.png)`
+![Workflow](./screenshots/workflow-overview.png)
 ## ✨ Features
 
 - **Data validation** — filters incomplete/malformed submissions before they enter the pipeline
@@ -93,22 +93,22 @@ Key nodes (HubSpot, Airtable, Slack, Groq calls) are configured with n8n's **Ret
 <summary>Click to expand screenshots</summary>
 
 ### Typeform submission
-`![Typeform](./screenshots/Typeform-form.png)`
+![Typeform](./screenshots/Typeform-form.png)
 
 ### Lead scored & synced to HubSpot
-`![HubSpot](./screenshots/HubSpot-record.png)`
+![HubSpot](./screenshots/HubSpot-record.png)
 
 ### Backup record in Airtable
-`![Airtable](./screenshots/Backup-on-Airtable.png)`
+![Airtable](./screenshots/Backup-on-Airtable.png)
 
 ### Hot lead Slack alert
-`![Slack](./screenshots/SlackTeamAltert.png)`
+![Slack](./screenshots/SlackTeamAltert.png)
 
 ### Follow-up calendar event created
-`![Calendar](./screenshots/Follow-up_schedule.png)`
+![Calendar](./screenshots/Follow-up_schedule.png)
 
 ### Automated email to the lead
-`![Email](./screenshots/transactional-email-to-Lead.png)`
+![Email](./screenshots/transactional-email-to-Lead.png)
 
 </details>
 
