@@ -44,14 +44,14 @@ Create a calendar Event
 
 - **Data validation** — filters incomplete/malformed submissions before they enter the pipeline
 - **AI spam detection** — checks email patterns, empty names, and message length/coherence to reject spammy or irrelevant submissions
-- **AI lead scoring** — uses Groq (in an OpenAI node) to score and prioritize each lead, with a structured summary
+- **AI lead scoring** — uses Groq (in an Groq node) to score and prioritize each lead, with a structured summary
 - **CRM sync** — pushes qualified leads into **HubSpot** with custom properties (`score`, `priority`, `summary`)
 - **Redundant backup** — mirrors every scored lead into **Airtable**
 - **Real-time alerts** — notifies the sales team on **Slack** the moment a lead scores as "hot"
 - **Smart scheduling** — automatically determines the right follow-up call time based on lead urgency, business hours, and skips weekends/off-hours
 - **Calendar automation** — books the follow-up directly onto the calendar
 - **Automated lead email** — sends a confirmation/response email to the lead
-- **Built-in resilience** — critical nodes use n8n's **Retry on Fail** strategy, so transient API failures (HubSpot, OpenAI, Slack rate limits, etc.) don't break the pipeline
+- **Built-in resilience** — critical nodes use n8n's **Retry on Fail** strategy, so transient API failures (HubSpot, Groq, Slack rate limits, etc.) don't break the pipeline
 
 ## 🛠️ Tech Stack
 
@@ -71,7 +71,7 @@ Create a calendar Event
 1. Import [`workflow.json`](./workflow.json) into your n8n instance (**Workflows → Import from File**)
 2. Configure credentials for each service used:
    - Typeform (Webhook, or Personal Access Token if using the Typeform Trigger node)
-   - OpenAI API key
+   - Groq API key
    - HubSpot Private App token (with contacts read/write scope)
    - Airtable Personal Access Token
    - Slack Bot Token (`chat:write` scope)
@@ -83,7 +83,7 @@ Create a calendar Event
 
 ## 🛡️ Error Handling
 
-Key nodes (HubSpot, Airtable, Slack, OpenAI calls) are configured with n8n's **Retry on Fail** setting, so transient failures (rate limits, timeouts, brief API outages) are automatically retried instead of silently dropping a lead.
+Key nodes (HubSpot, Airtable, Slack, Groq calls) are configured with n8n's **Retry on Fail** setting, so transient failures (rate limits, timeouts, brief API outages) are automatically retried instead of silently dropping a lead.
 
 ## 📸 Workflow in Action
 
