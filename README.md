@@ -1,6 +1,6 @@
 # AI-Powered Lead Management Automation (n8n)
 
-An end-to-end lead management pipeline built in **n8n** that captures leads from **Typeform**, validates and filters spam, scores lead quality using **OpenAI**, and routes hot leads through **HubSpot**, **Airtable**, **Slack**, and automated **calendar scheduling** — with zero manual triage.
+An end-to-end lead management pipeline built in **n8n** that captures leads from **Typeform**, validates and filters spam, scores lead quality using **Groq**, and routes hot leads through **HubSpot**, **Airtable**, **Slack**, and automated **calendar scheduling** — with zero manual triage.
 
 ![n8n](https://img.shields.io/badge/n8n-workflow-EA4B71?logo=n8n&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
