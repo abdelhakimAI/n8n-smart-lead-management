@@ -1,0 +1,1091 @@
+{
+  "name": "Smart Lead Management",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        -448
+      ],
+      "id": "0ce7940b-0db4-4e9e-9797-251a50f9a1a8",
+      "name": "Webhook",
+      "webhookId": "20117a56-8aa2-41f4-8c37-be77cd4b6507"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"rejected\" ,\n  \"reason\": \"validation failed\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        544,
+        -288
+      ],
+      "id": "18ba3477-72b4-46aa-ae8f-9040053306b4",
+      "name": "Rejection Response"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "llama-3.3-70b-versatile",
+          "mode": "list",
+          "cachedResultName": "llama-3.3-70b-versatile"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        -464
+      ],
+      "id": "e31b1a64-11f4-4910-9124-fd5c28a63dc9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Place Your API Here",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2582e01f-7396-4b7c-b530-097b37397308",
+              "name": "=spam",
+              "value": "={{ JSON.parse($json.text).spam }}",
+              "type": "boolean"
+            },
+            {
+              "id": "20675aa7-abf6-4013-be88-37acb213152b",
+              "name": "=reason",
+              "value": "={{ JSON.parse($json.text).reason }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        -592
+      ],
+      "id": "b5d2875e-9b6d-477a-8fe5-ba12a37675e1",
+      "name": "Parsing the output"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e1ee7471-982a-4016-867f-73157f3e21a5",
+              "leftValue": "={{ $json.spam }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        -592
+      ],
+      "id": "98aea8d8-55c6-4706-a49b-1028f93d8228",
+      "name": "If spam?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75529092-10b5-495a-9a7a-27a3b4f584e3",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "3f330728-77c3-4c24-b08a-9b253c321509",
+              "name": "body.message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "b911807a-2281-4b26-9765-7ffededccc02",
+              "name": "body.name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "aff34b9b-2fae-4aa1-8ce8-3e3a98f7d4f1",
+              "name": "body.company",
+              "value": "={{ $json.body.company }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        -448
+      ],
+      "id": "bb5f395d-1fc3-4f66-9ad2-72e2fc4f58c5",
+      "name": "Filter Webhook Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "48dd0e00-15cb-4673-b764-72d99e8278b5",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "9ef3087f-91d0-49ee-b581-cbd7043c377e",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "82e7bc4b-bf84-40c8-8ca4-7a7fbcb221d2",
+              "leftValue": "={{ $json.body.message.length }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        -448
+      ],
+      "id": "76e22b6b-0066-411a-8ff3-507d544f6290",
+      "name": "Is this data Valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"rejected\" ,\n  \"reason\": \"spam detected\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1280,
+        -592
+      ],
+      "id": "e6c1e0e5-dd1f-4a0b-8b52-3e98e08ff039",
+      "name": "Rejection"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"received\",\n  \"valid\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1280,
+        -400
+      ],
+      "id": "4cb1ff84-cc7c-4c27-9f54-3fa94b214261",
+      "name": "Success"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1160d0-4ce4-489a-9482-621ecfccaa5d",
+              "name": "=score",
+              "value": "={{JSON.parse($json.text).score}}",
+              "type": "number"
+            },
+            {
+              "id": "73f29b38-8382-4734-8e30-9d9eaa3a6da0",
+              "name": "priority",
+              "value": "={{JSON.parse($json.text).priority}}",
+              "type": "string"
+            },
+            {
+              "id": "e9a9c33d-172e-4085-a30b-8d7c293a9e73",
+              "name": "summary",
+              "value": "={{JSON.parse($json.text).summary}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1856,
+        -400
+      ],
+      "id": "4b263a6d-7697-4f3e-b8a8-2107032e9183",
+      "name": "Parsing the scoring"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "llama-3.3-70b-versatile",
+          "mode": "list",
+          "cachedResultName": "llama-3.3-70b-versatile"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1584,
+        -176
+      ],
+      "id": "1fd2fd22-6692-4adf-98d2-2135a07fc89a",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "Place Your API Here",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Only relevant business inquiries & coherent data. No spamy-leads go",
+        "height": 96,
+        "width": 224,
+        "color": "#11E86F"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -416
+      ],
+      "id": "b5c3268c-f447-4126-a829-6a52fe4782cc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c9345af-db9a-421f-8e2c-716e3c7ced5e",
+              "leftValue": "={{ $('Parsing the scoring').item.json.score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2304,
+        -496
+      ],
+      "id": "3c02cc1e-7cf7-4447-9dbd-720d2649d23c",
+      "name": "Is the score high?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.hubapi.com/crm/v3/objects/contacts/",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "hubspotAppToken",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"properties\": {\n    \"full_name\": \"{{ $('Filter Webhook Data').item.json.body.name }}\",\n    \"email\": \"{{ $('Filter Webhook Data').item.json.body.email }}\",\n    \"company\": \"{{ $('Filter Webhook Data').item.json.body.company }}\",\n    \"lead_score\": \"{{ $json.score }}\",\n    \"lead_priority\": \"{{ $json.priority }}\",\n    \"lead_summary\": \"{{ $json.summary }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2080,
+        -400
+      ],
+      "id": "7861aa42-31ce-4975-84e8-40e07ed16b08",
+      "name": "Add to HubSpot",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "Place Your Service Key or Legacy app token Here",
+          "name": "HubSpot Service Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Is this data Valid?').item.json.body.email }}",
+        "subject": "We've Received Your Inquiry – Thank You!",
+        "message": "=<!DOCTYPE html>\n<html>\n\n<body style=\"font-family: Arial, sans-serif; color:#333; line-height:1.6;\">\n\n<h2>Thank you for contacting us!</h2>\n\n<p>\nHi <strong>{{ $('Is this data Valid?').item.json.body.name}}</strong>,\n</p>\n\n<p>\nWe've successfully received your inquiry and appreciate your interest.\n</p>\n\n<p>\nOur team is currently reviewing your request.\nOne of our specialists will contact you within the next\n<strong>24 business hours.</strong>\n</p>\n\n<hr>\n\n<h3>Your Submission</h3>\n\n<table cellpadding=\"6\">\n\n<tr>\n<td><strong>Name</strong></td>\n<td>{{ $('Is this data Valid?').item.json.body.name}}</td>\n</tr>\n\n<tr>\n<td><strong>Company</strong></td>\n<td>{{ $('Is this data Valid?').item.json.body.company}}</td>\n</tr>\n\n<tr>\n<td><strong>Email</strong></td>\n<td>{{ $('Is this data Valid?').item.json.body.email}}</td>\n</tr>\n\n<tr>\n<td><strong>Message</strong></td>\n<td>{{ $('Is this data Valid?').item.json.body.message}}</td>\n</tr>\n\n</table>\n\n<hr>\n\n<p>\nIf you'd like to add more information,\nsimply reply to this email.\n</p>\n\n<p>\nBest regards,<br>\n<strong>The Sales Team</strong>\n</p>\n\n<hr>\n\n<p style=\"font-size:12px;color:#777;\">\nThis is an automated confirmation email generated by our Lead Management System.\nPlease do not reply unless you wish to provide additional information.\n</p>\n\n</body>\n\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2080,
+        -208
+      ],
+      "id": "2007c054-29fe-441f-a8a6-b12205e814f5",
+      "name": "Email the lead",
+      "webhookId": "7e391ee2-b6c8-4761-b8c6-a6e1205bb91c",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Place Your OAuth Here",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appm33fPU2fpFn1Kh",
+          "mode": "list",
+          "cachedResultName": "Smart_Lead_management",
+          "cachedResultUrl": "https://airtable.com/appm33fPU2fpFn1Kh"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblC9grPWlu96Z9BO",
+          "mode": "list",
+          "cachedResultName": "Lead Backup",
+          "cachedResultUrl": "https://airtable.com/appm33fPU2fpFn1Kh/tblC9grPWlu96Z9BO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Score": "={{ $json.score }}",
+            "Name": "={{ $('Filter Webhook Data').item.json.body.name }}",
+            "Email": "={{ $('Filter Webhook Data').item.json.body.email }}",
+            "Company": "={{ $('Filter Webhook Data').item.json.body.company }}",
+            "Priority": "={{ $json.priority }}",
+            "Notes": "={{ $json.summary }}",
+            "Status": "New"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Low",
+                  "value": "Low"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Contacted",
+                  "value": "Contacted"
+                },
+                {
+                  "name": "Negotiation",
+                  "value": "Negotiation"
+                },
+                {
+                  "name": "Won",
+                  "value": "Won"
+                },
+                {
+                  "name": "Lost",
+                  "value": "Lost"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2080,
+        -592
+      ],
+      "id": "e97b8acd-3fbb-49e7-bec0-d19a66317e5e",
+      "name": "Backup on Airtable",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "Place Your OAuth Here",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appm33fPU2fpFn1Kh",
+          "mode": "list",
+          "cachedResultName": "Smart_Lead_management",
+          "cachedResultUrl": "https://airtable.com/appm33fPU2fpFn1Kh"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblKNG3NgE7XG9A92",
+          "mode": "list",
+          "cachedResultName": "Spam Leads",
+          "cachedResultUrl": "https://airtable.com/appm33fPU2fpFn1Kh/tblKNG3NgE7XG9A92"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Spam Reason": "={{ $('Parsing the output').item.json.reason }}",
+            "Name": "={{ $('Is this data Valid?').item.json.body.name }}",
+            "Company": "={{ $('Is this data Valid?').item.json.body.company }}",
+            "Email": "={{ $('Is this data Valid?').item.json.body.email }}",
+            "Message": "={{ $('Is this data Valid?').item.json.body.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Spam Reason",
+              "displayName": "Spam Reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Created",
+              "displayName": "Date Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        -784
+      ],
+      "id": "9052d4aa-2ffb-4015-ad37-b42898a75be3",
+      "name": "Log spam",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "Place Your OAuth Here",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a sales manager.\n\nScore this lead from 1-100: \n{{ $('Filter Webhook Data').item.json.body.company }}\n{{ $('Filter Webhook Data').item.json.body.name }}\n{{ $('Filter Webhook Data').item.json.body.message }}\n{{ $('Filter Webhook Data').item.json.body.email }}\n\nConsider:\n\nCompany\n\nMessage quality\n\nIntent\n\nBudget signals\n\nUrgency\n\nReturn a JSON like this, don't give preamble text or extra texts, just the json as below exactly: \n\n{\n \"score\":92,\n \"priority\":\"High\",\n \"summary\":\"Enterprise customer likely interested.\"\n} ",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1504,
+        -400
+      ],
+      "id": "1982a1eb-df81-4212-9d3c-065eefc43b1d",
+      "name": "AI Lead scoring",
+      "retryOnFail": true,
+      "waitBetweenTries": 100
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a spam filter for a sales lead form. Analyze the following lead and determine if it is spam or a genuine business inquiry.\n\nName: {{ $json.body.name }}\nEmail: {{ $json.body.email }}\nCompany:{{ $json.body.company }}\nMessage: {{ $json.body.message }}\n\nSpam indicators: gibberish text, no relevance to a business inquiry, someone pitching their own unrelated service/product, generic mass-spam phrasing, suspicious or throwaway-looking email domains.\n\nReturn ONLY valid JSON in this exact format, with no other text:\n{\n  \"spam\": true or false,\n  \"reason\": \"short explanation\"\n}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        480,
+        -688
+      ],
+      "id": "c34fed3d-652d-4db2-a31b-ebfd614d23f3",
+      "name": "Spam Detection",
+      "retryOnFail": true,
+      "waitBetweenTries": 100
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#hot-leads",
+          "mode": "name"
+        },
+        "text": "=🚀 New High-Priority Lead\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n👤 Name\n {{ $('Is this data Valid?').item.json.body.name}}\n\n🏢 Company\n {{ $('Is this data Valid?').item.json.body.company}}\n\n📧 Email\n {{ $('Is this data Valid?').item.json.body.email}}\n\n⭐ AI Score\n{{$('Parsing the scoring').item.json.score}} / 100\n\n🔥 Priority\nHigh\n\n📝 AI Summary\n{{$('Parsing the scoring').item.json.summary}}\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n📅 Action Required\nFollow up within 24 hours.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        2528,
+        -496
+      ],
+      "id": "f40ec95b-023c-4424-b4c0-d117afaa6e6b",
+      "name": "Send a message",
+      "webhookId": "8972753d-2a7c-4480-99b1-9259d8eb97b7",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "slackApi": {
+          "id": "Place Your Slack access token Here",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * =====================================================\n * Production Calendar Scheduler\n * Smart Lead Management\n * =====================================================\n */\n\nconst CONFIG = {\n    HIGH_PRIORITY_SCORE: 80,\n\n    BUSINESS_START_HOUR: 9,\n    BUSINESS_START_MINUTE: 0,\n\n    BUSINESS_END_HOUR: 17,\n    BUSINESS_END_MINUTE: 30,\n\n    MEETING_DURATION_MINUTES: 30,\n\n    HIGH_PRIORITY_DELAY_MINUTES: 30,\n};\n\n//-------------------------------------------\n// Input\n//-------------------------------------------\n\nconst score = Number($('Parsing the scoring').item.json.score);\n\n//-------------------------------------------\n// Current time\n//-------------------------------------------\n\nconst now = new Date();\n\n//-------------------------------------------\n// Helpers\n//-------------------------------------------\n\nfunction isWeekend(date) {\n    const day = date.getDay();\n    return day === 0 || day === 6;\n}\n\nfunction isBusinessHours(date) {\n\n    if (isWeekend(date)) return false;\n\n    const minutes =\n        date.getHours() * 60 +\n        date.getMinutes();\n\n    const start =\n        CONFIG.BUSINESS_START_HOUR * 60 +\n        CONFIG.BUSINESS_START_MINUTE;\n\n    const end =\n        CONFIG.BUSINESS_END_HOUR * 60 +\n        CONFIG.BUSINESS_END_MINUTE;\n\n    return minutes >= start && minutes < end;\n}\n\nfunction nextBusinessDay9AM(date) {\n\n    const d = new Date(date);\n\n    do {\n        d.setDate(d.getDate() + 1);\n    }\n    while (isWeekend(d));\n\n    d.setHours(\n        CONFIG.BUSINESS_START_HOUR,\n        CONFIG.BUSINESS_START_MINUTE,\n        0,\n        0\n    );\n\n    return d;\n}\n\nfunction addMinutes(date, minutes) {\n    return new Date(date.getTime() + minutes * 60000);\n}\n\n//-------------------------------------------\n// Scheduling Logic\n//-------------------------------------------\n\nlet start;\nlet end;\nlet reason;\n\nif (score >= CONFIG.HIGH_PRIORITY_SCORE) {\n\n    if (isBusinessHours(now)) {\n\n        const candidateStart =\n            addMinutes(\n                now,\n                CONFIG.HIGH_PRIORITY_DELAY_MINUTES\n            );\n\n        const businessClose = new Date(now);\n\n        businessClose.setHours(\n            CONFIG.BUSINESS_END_HOUR,\n            CONFIG.BUSINESS_END_MINUTE,\n            0,\n            0\n        );\n\n        const candidateEnd =\n            addMinutes(\n                candidateStart,\n                CONFIG.MEETING_DURATION_MINUTES\n            );\n\n        if (candidateEnd <= businessClose) {\n\n            start = candidateStart;\n\n            end = candidateEnd;\n\n            reason =\n                \"High priority during business hours\";\n\n        } else {\n\n            start = nextBusinessDay9AM(now);\n\n            end = addMinutes(\n                start,\n                CONFIG.MEETING_DURATION_MINUTES\n            );\n\n            reason =\n                \"Business closing soon\";\n        }\n\n    } else {\n\n        start = nextBusinessDay9AM(now);\n\n        end = addMinutes(\n            start,\n            CONFIG.MEETING_DURATION_MINUTES\n        );\n\n        reason =\n            \"Outside business hours\";\n    }\n\n} else {\n\n    start = nextBusinessDay9AM(now);\n\n    end = addMinutes(\n        start,\n        CONFIG.MEETING_DURATION_MINUTES\n    );\n\n    reason =\n        \"Normal priority\";\n}\n\n//-------------------------------------------\n// Output\n//-------------------------------------------\n\nreturn [{\n    json: {\n\n        score,\n\n        priority:\n            score >= CONFIG.HIGH_PRIORITY_SCORE\n                ? \"High\"\n                : \"Normal\",\n\n        calendarStart:\n            start.toISOString(),\n\n        calendarEnd:\n            end.toISOString(),\n\n        schedulingReason:\n            reason,\n\n        generatedAt:\n            now.toISOString()\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        -304
+      ],
+      "id": "4acd173a-77ef-44a6-8a71-549aa7d9c8e6",
+      "name": "Determine Follow-up Schedule"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "Place Your Email Here",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "start": "={{ $calendarStart }}",
+        "end": "={{ $calendarEnd }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "description": "=Lead: {{ $('Filter Webhook Data').item.json.body.name}}\n\nCompany: {{ $('Filter Webhook Data').item.json.body.company}}\n\nEmail:{{ $('Filter Webhook Data').item.json.body.email}}\n\nAI Score: {{$json.score}}/100\n\nPriority: {{$json.priority}}\n\nAI Summary:\n{{$('Parsing the scoring').item.json.summary}}\n\nHubSpot Contact:\n{{ $('Add to HubSpot').item.json.url}}",
+          "summary": "=Follow-up with {{ $('Filter Webhook Data').item.json.body.name}}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        -304
+      ],
+      "id": "242cd168-e344-49ac-a353-e58f92c06f26",
+      "name": "Create an event",
+      "retryOnFail": true,
+      "waitBetweenTries": 100,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Place Your Calendar OAuth Here",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "We determine the call time based on urgency if the lead scored high or not, plus the business work hours, skipping weekends and no-work hours.",
+        "height": 144,
+        "width": 256
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        -128
+      ],
+      "id": "21edff0d-a7e0-4320-9b04-e575149a540c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Checking Email pattern, empty name, & message length",
+        "height": 96,
+        "width": 224,
+        "color": "#467203"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -288
+      ],
+      "id": "3fdd865a-0379-4a8b-8291-fcf190cc8061",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 720,
+        "width": 1664,
+        "color": "#FF9335"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -848
+      ],
+      "id": "a7c85619-1e00-48b9-8d98-9196a1fd7154",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter Webhook Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Spam Detection",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsing the output": {
+      "main": [
+        [
+          {
+            "node": "If spam?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Webhook Data": {
+      "main": [
+        [
+          {
+            "node": "Is this data Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is this data Valid?": {
+      "main": [
+        [
+          {
+            "node": "Spam Detection",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejection Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If spam?": {
+      "main": [
+        [
+          {
+            "node": "Rejection",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log spam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success": {
+      "main": [
+        [
+          {
+            "node": "AI Lead scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Lead scoring",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsing the scoring": {
+      "main": [
+        [
+          {
+            "node": "Backup on Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to HubSpot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email the lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Is the score high?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Determine Follow-up Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email the lead": {
+      "main": [
+        []
+      ]
+    },
+    "Backup on Airtable": {
+      "main": [
+        []
+      ]
+    },
+    "AI Lead scoring": {
+      "main": [
+        [
+          {
+            "node": "Parsing the scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spam Detection": {
+      "main": [
+        [
+          {
+            "node": "Parsing the output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is the score high?": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Determine Follow-up Schedule": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Casablanca",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "bdbc3812-a811-49de-821e-c853fcabafb4",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "id": "",
+  "tags": []
+}
