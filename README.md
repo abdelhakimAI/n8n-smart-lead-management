@@ -44,7 +44,7 @@ Create a calendar Event
 
 - **Data validation** — filters incomplete/malformed submissions before they enter the pipeline
 - **AI spam detection** — checks email patterns, empty names, and message length/coherence to reject spammy or irrelevant submissions
-- **AI lead scoring** — uses OpenAI to score and prioritize each lead, with a structured summary
+- **AI lead scoring** — uses Groq (in an OpenAI node) to score and prioritize each lead, with a structured summary
 - **CRM sync** — pushes qualified leads into **HubSpot** with custom properties (`score`, `priority`, `summary`)
 - **Redundant backup** — mirrors every scored lead into **Airtable**
 - **Real-time alerts** — notifies the sales team on **Slack** the moment a lead scores as "hot"
