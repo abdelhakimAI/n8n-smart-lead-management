@@ -24,7 +24,7 @@ Parsing the Output → If spam?
       ↓ (not spam)        ↓ (spam)
                        Log spam + Rejection
       ↓
-AI Lead Scoring (OpenAI)
+AI Lead Scoring (Groq Llama versatile)
       ↓
 Parsing the Scoring
       ↓
