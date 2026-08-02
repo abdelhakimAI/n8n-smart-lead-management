@@ -59,7 +59,7 @@ Create a calendar Event
 |---|---|
 | [n8n](https://n8n.io) | Workflow orchestration |
 | [Typeform](https://typeform.com) | Lead capture form |
-| [OpenAI](https://groq.com) | Spam detection + lead scoring (AI Agent nodes) |
+| [Groq](https://groq.com) | Spam detection + lead scoring (AI Agent nodes) |
 | [HubSpot](https://hubspot.com) | CRM / contact management |
 | [Airtable](https://airtable.com) | Backup lead database |
 | [Slack](https://slack.com) | Real-time hot-lead alerts |
