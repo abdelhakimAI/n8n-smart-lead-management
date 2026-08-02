@@ -112,7 +112,6 @@ Key nodes (HubSpot, Airtable, Slack, Groq calls) are configured with n8n's **Ret
 
 </details>
 
-*(Replace the paths above with real screenshots in a `/screenshots` folder — drag your images in and update the markdown image syntax, e.g. `![HubSpot](./screenshots/hubspot.png)`.)*
 
 ## 📄 License
 
