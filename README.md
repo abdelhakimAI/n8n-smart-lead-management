@@ -42,6 +42,9 @@ Create a calendar Event
 
 ### Workflow Screenshot
 ![Workflow](./screenshots/workflow-overview.png)
+
+### Full Demo video: 
+![Demo](https://www.linkedin.com/posts/abdelhakim-azelag-28903530b_n8n-aiautomation-leadmanagement-ugcPost-7492258024905007104-cNc3/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE7ZRkkBCzEmUX5jviPuqXub0SzYpMveiy4)
 ## ✨ Features
 
 - **Data validation** — filters incomplete/malformed submissions before they enter the pipeline
